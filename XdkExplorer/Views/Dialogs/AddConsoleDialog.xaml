@@ -1,0 +1,24 @@
+<Window x:Class="XdkExplorer.Views.AddConsoleDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:XdkExplorer.Views"
+        xmlns:design="clr-namespace:XdkExplorer.Design"
+        mc:Ignorable="d"
+        d:DataContext="{x:Static design:DesignData.ConnectSuccess}"
+        Title="Add Xbox" Width="480" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource ContentBackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}">
+
+    <StackPanel Margin="24,20,24,20">
+        <views:ConsoleConnectForm/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+            <Button Content="Add" Style="{StaticResource AccentButton}" MinWidth="90" Click="OnAdd"
+                    IsEnabled="{Binding IsConnected}"/>
+            <Button Content="Cancel" Style="{StaticResource OutlineButton}" MinWidth="90" Height="32" Margin="8,0,0,0" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

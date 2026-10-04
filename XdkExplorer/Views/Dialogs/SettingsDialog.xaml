@@ -1,0 +1,95 @@
+<Window x:Class="XdkExplorer.Views.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:design="clr-namespace:XdkExplorer.Design"
+        mc:Ignorable="d"
+        d:DataContext="{x:Static design:DesignData.Settings}"
+        Title="Settings" Width="560" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource ContentBackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}">
+
+    <Window.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="24,20,24,20">
+
+        <!-- TODO: Add dynamic theming (light palette in Themes, StaticResource to DynamicResource) -->
+
+       
+
+        <!-- XDK -->
+        <TextBlock Text="Xbox Development Kit" Style="{StaticResource SectionTitle}"/>
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="Path to xboxdbg.dll" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6"/>
+                <TextBlock Text="{Binding XdkPath, TargetNullValue='–'}" TextWrapping="Wrap" FontFamily="Consolas" FontSize="13"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="&#xE73E;" Style="{StaticResource IconText}" FontSize="12" Foreground="{StaticResource SuccessBrush}"
+                               Visibility="{Binding XdkPath, Converter={StaticResource NotEmptyToVis}}" Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding XdkStatus}" Style="{StaticResource CaptionText}"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding XdkError}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" Margin="0,8,0,0"
+                           Visibility="{Binding XdkError, Converter={StaticResource NotEmptyToVis}}"/>
+
+                <Border Padding="10,8" Margin="0,10,0,0" CornerRadius="4" Background="{StaticResource InfoBarBackgroundBrush}"
+                        Visibility="{Binding IsRestartRequired, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="The new path is used after XDK Explorer has been restarted." TextWrapping="Wrap"/>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Style="{StaticResource OutlineButton}" Height="32" Content="Change …" Command="{Binding ChangeXdkCommand}"/>
+                    <Button Style="{StaticResource OutlineButton}" Height="32" Margin="8,0,0,0" Content="Search again"
+                            Command="{Binding SearchAgainCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Transfers -->
+        <TextBlock Text="Transfers (advanced)" Style="{StaticResource SectionTitle}"/>
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <DockPanel>
+                    <ComboBox DockPanel.Dock="Right" Width="170" ItemsSource="{Binding BlockSizes}" DisplayMemberPath="Label"
+                       SelectedItem="{Binding SelectedBlockSize}"/>
+                    <TextBlock Text="Block size" VerticalAlignment="Center"/>
+                </DockPanel>
+                <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap" Margin="0,8,0,0"
+                    Text="Smaller blocks react faster when a transfer is cancelled on a slow connection such as xemu. The transfer speed stays the same. Applies to new transfers."/>
+            </StackPanel>
+        </Border>
+
+        <!-- About -->
+        <TextBlock Text="About" Style="{StaticResource SectionTitle}"/>
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="{Binding AppVersionText}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding RuntimeText}" Style="{StaticResource CaptionText}" Margin="0,2,0,0"/>
+                <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap" Margin="0,10,0,0"
+                    Text="Trouble with a console or with transfers? Run XdkExplorer.exe --diagnose to check the connection and gather relevant diagnostic data."/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+            <Button Content="Save" Style="{StaticResource AccentButton}" MinWidth="90" IsDefault="True" Click="OnSave"/>
+            <Button Content="Cancel" Style="{StaticResource OutlineButton}" MinWidth="90" Height="32" Margin="8,0,0,0" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

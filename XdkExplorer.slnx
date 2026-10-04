@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/build.yml" />
+  </Folder>
+  <Project Path="XdkExplorer/XdkExplorer.csproj" />
+</Solution>

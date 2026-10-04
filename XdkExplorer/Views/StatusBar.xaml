@@ -1,0 +1,40 @@
+<UserControl x:Class="XdkExplorer.Views.StatusBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:XdkExplorer.Design"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static design:DesignData.Main}"
+             d:DesignWidth="1280" d:DesignHeight="28"
+             d:Background="{StaticResource WindowBackgroundBrush}">
+
+    <!-- Bound to MainViewModel because it shows browser and transfer state side by side -->
+    <DockPanel Margin="16,0" TextElement.FontSize="12" TextElement.Foreground="{StaticResource TextSecondaryBrush}">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                    DataContext="{Binding Transfers}"
+                    Visibility="{Binding HasActive, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding ActiveJob.Label}"/>
+            <ProgressBar Style="{StaticResource ThinProgressBar}" Width="60" Margin="8,0" VerticalAlignment="Center"
+                         Value="{Binding ActiveJob.Progress, Mode=OneWay}"/>
+            <TextBlock Text="{Binding ActiveJob.RateText}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DataContext="{Binding Browser}">
+            <Ellipse Width="6" Height="6" Margin="0,0,6,0">
+                <Ellipse.Style>
+                    <Style TargetType="Ellipse">
+                        <Setter Property="Fill" Value="{StaticResource TextOfflineBrush}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="Fill" Value="{StaticResource AccentBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Ellipse.Style>
+            </Ellipse>
+            <TextBlock Text="{Binding ConnectionText}"/>
+            <TextBlock Text="{Binding SelectionText}" Margin="20,0,0,0"/>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

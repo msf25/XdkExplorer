@@ -1,0 +1,27 @@
+<UserControl x:Class="XdkExplorer.Views.InfoBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:XdkExplorer.Design"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static design:DesignData.InfoBar}"
+             d:DesignWidth="990"
+             d:Background="{StaticResource ContentBackgroundBrush}"
+             Foreground="{StaticResource TextPrimaryBrush}"
+             Visibility="{Binding Message, Converter={StaticResource NotEmptyToVis}}">
+
+    <Border Margin="12,8,12,0" MinHeight="44" Padding="14,0,6,0" CornerRadius="4"
+            Background="{StaticResource InfoBarBackgroundBrush}" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <DockPanel>
+            <Border DockPanel.Dock="Left" Width="16" Height="16" CornerRadius="8" Background="{StaticResource AccentBrush}">
+                <TextBlock Text="i" FontSize="11" FontWeight="Bold" Foreground="{StaticResource OnAccentBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Width="32" Command="{Binding CloseCommand}">
+                <TextBlock Text="&#xE711;" Style="{StaticResource IconText}" FontSize="11"/>
+            </Button>
+            <TextBlock Text="{Binding Message}" Margin="12,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        </DockPanel>
+    </Border>
+</UserControl>

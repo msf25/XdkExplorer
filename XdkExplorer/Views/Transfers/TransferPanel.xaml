@@ -1,0 +1,67 @@
+<UserControl x:Class="XdkExplorer.Views.TransferPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:XdkExplorer.ViewModels"
+             xmlns:views="clr-namespace:XdkExplorer.Views"
+             xmlns:design="clr-namespace:XdkExplorer.Design"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static design:DesignData.Transfers}"
+             d:DesignWidth="990"
+             d:Background="{StaticResource ContentBackgroundBrush}"
+             Foreground="{StaticResource TextPrimaryBrush}"
+             Visibility="{Binding HasJobs, Converter={StaticResource BoolToVis}}">
+
+    <Border Margin="12,0,12,12" CornerRadius="6" Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <DockPanel>
+            <!-- Header, doubles as the collapsed bar -->
+            <DockPanel DockPanel.Dock="Top" Height="44" Margin="16,0,8,0">
+                <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Width="32" Command="{Binding ToggleCommand}">
+                    <TextBlock FontSize="11">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource IconText}">
+                                <Setter Property="Text" Value="&#xE70E;"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                        <Setter Property="Text" Value="&#xE70D;"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
+                <Button DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Height="28" Margin="0,0,4,0"
+                        Foreground="{StaticResource AccentTextBrush}" Command="{Binding ClearFinishedCommand}" Content="Clear finished"
+                        Visibility="{Binding HasFinished, Converter={StaticResource BoolToVis}}"/>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Transfers" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Summary}" Style="{StaticResource CaptionText}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+
+                    <!-- Mini progress while collapsed -->
+                    <StackPanel Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center"
+                                Visibility="{Binding IsOpen, Converter={StaticResource InverseBoolToVis}}">
+                        <ProgressBar Style="{StaticResource ThinProgressBar}" Width="160" Value="{Binding ActiveJob.Progress, Mode=OneWay}"
+                                     Visibility="{Binding HasActive, Converter={StaticResource BoolToVis}}"/>
+                        <TextBlock Text="{Binding ActiveJob.RateText}" Style="{StaticResource CaptionText}" Margin="12,0,0,0"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+
+            <ScrollViewer MaxHeight="224" VerticalScrollBarVisibility="Auto" Padding="16,0"
+                          BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,1,0,0"
+                          Visibility="{Binding IsOpen, Converter={StaticResource BoolToVis}}">
+                <ItemsControl ItemsSource="{Binding Jobs}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:TransferJobViewModel}">
+                            <views:TransferJobItem/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+</UserControl>

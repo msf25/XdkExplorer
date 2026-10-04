@@ -1,0 +1,48 @@
+# Builds on every push and pull request.
+# A tag like v0.1.0 also publishes both profiles and attaches them to a GitHub release:
+#   XdkExplorer-0.1.0.zip             small, needs the .NET 10 Desktop Runtime (x86)
+#   XdkExplorer-0.1.0-standalone.zip  includes the runtime, runs without installing anything
+
+name: Build
+
+on:
+  push:
+    branches: [ '**' ]
+    tags: [ 'v*' ]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build XdkExplorer.slnx -c Release
+
+      - name: Publish and create release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = '${{ github.ref_name }}'.TrimStart('v')
+
+          dotnet publish XdkExplorer/XdkExplorer.csproj -p:PublishProfile=FrameworkDependent -p:Version=$version
+          dotnet publish XdkExplorer/XdkExplorer.csproj -p:PublishProfile=Standalone -p:Version=$version
+
+          Compress-Archive XdkExplorer/bin/publish/framework-dependent/* "XdkExplorer-$version.zip"
+          Compress-Archive XdkExplorer/bin/publish/standalone/* "XdkExplorer-$version-standalone.zip"
+
+          gh release create '${{ github.ref_name }}' "XdkExplorer-$version.zip" "XdkExplorer-$version-standalone.zip" `
+            --title "XDK Explorer $version" --generate-notes

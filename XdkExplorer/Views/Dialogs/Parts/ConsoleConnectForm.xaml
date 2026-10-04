@@ -1,0 +1,52 @@
+<UserControl x:Class="XdkExplorer.Views.ConsoleConnectForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:XdkExplorer.Design"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static design:DesignData.ConnectSuccess}"
+             d:DesignWidth="420"
+             d:Background="{StaticResource ContentBackgroundBrush}"
+             Foreground="{StaticResource TextPrimaryBrush}">
+
+    <StackPanel>
+        <!-- Optional hint, e.g. the default console found in the XDK -->
+        <Border Padding="12,10" Margin="0,0,0,16" CornerRadius="4" Background="{StaticResource AccentSubtleBrush}"
+                Visibility="{Binding Hint, Converter={StaticResource NotEmptyToVis}}">
+            <TextBlock Text="{Binding Hint}" TextWrapping="Wrap"/>
+        </Border>
+
+        <TextBlock Text="Name or IP address" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6"/>
+
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Height="32" Margin="8,0,0,0"
+                    Content="Test connection" Command="{Binding TestCommand}" IsDefault="True"/>
+            <TextBox x:Name="InputBox" Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+        </DockPanel>
+
+        <!-- Test running -->
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0"
+                    Visibility="{Binding IsTesting, Converter={StaticResource BoolToVis}}">
+            <ProgressBar IsIndeterminate="True" Width="60" VerticalAlignment="Center"/>
+            <TextBlock Text="Connecting …" Margin="10,0,0,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Success -->
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0"
+                    Visibility="{Binding IsConnected, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="&#xE73E;" Style="{StaticResource IconText}" FontSize="13" Foreground="{StaticResource SuccessBrush}"/>
+            <TextBlock Text="{Binding ResultText}" Margin="8,0,0,0" Foreground="{StaticResource SuccessBrush}" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Failure -->
+        <DockPanel Margin="0,12,0,0" Visibility="{Binding HasFailed, Converter={StaticResource BoolToVis}}">
+            <TextBlock DockPanel.Dock="Left" Text="&#xE711;" Style="{StaticResource IconText}" FontSize="12"
+                       VerticalAlignment="Top" Margin="0,3,0,0" Foreground="{StaticResource ErrorBrush}"/>
+            <TextBlock Text="{Binding ResultText}" Margin="8,0,0,0" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap"/>
+        </DockPanel>
+
+        <CheckBox Content="Set as default console" Margin="0,16,0,0" IsChecked="{Binding SetAsDefault}"
+                  ToolTip="Visual Studio .NET 2003 and the XDK tools use the default console"/>
+    </StackPanel>
+</UserControl>

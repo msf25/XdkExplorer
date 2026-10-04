@@ -1,0 +1,484 @@
+<UserControl x:Class="XdkExplorer.Views.ConsoleOverviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:XdkExplorer.ViewModels"
+             xmlns:design="clr-namespace:XdkExplorer.Design"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static design:DesignData.Overview}"
+             d:DesignWidth="990" d:DesignHeight="1150"
+             d:Background="{StaticResource ContentBackgroundBrush}"
+             Foreground="{StaticResource TextPrimaryBrush}"
+             Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}">
+
+    <UserControl.Resources>
+        <Style x:Key="StatusDot" TargetType="Ellipse">
+            <Setter Property="Fill" Value="{StaticResource TextOfflineBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Console.Status}" Value="Online">
+                    <Setter Property="Fill" Value="{StaticResource AccentBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Console.Status}" Value="Checking">
+                    <Setter Property="Fill" Value="{StaticResource WarningBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CardTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style x:Key="CardText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="Margin" Value="0,2,0,0"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="Margin" Value="0,0,16,10"/>
+        </Style>
+
+        <Style x:Key="FieldValue" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="ErrorText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource ErrorBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,12,0,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" FocusVisualStyle="{x:Null}">
+        <Grid x:Name="Page" Margin="24,12,24,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="900"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+
+                <!-- Header -->
+                <Grid Margin="0,4,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Width="64" Height="64">
+                        <Border CornerRadius="8" Background="{StaticResource SubtleFillBrush}"
+                                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"/>
+                        <Grid Width="34" Height="20">
+                            <Rectangle RadiusX="3" RadiusY="3" StrokeThickness="1.6" Stroke="{StaticResource TextPrimaryBrush}"/>
+                            <Ellipse Width="6" Height="6" Fill="{StaticResource TextPrimaryBrush}"/>
+                        </Grid>
+                        <Ellipse Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,9,13"
+                                 Stroke="#232323" StrokeThickness="2" Style="{StaticResource StatusDot}"/>
+                    </Grid>
+
+                    <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Console.DisplayName}" FontSize="28" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                            <Border Height="24" Padding="10,0" Margin="12,0,0,0" CornerRadius="12" VerticalAlignment="Center"
+                                    Background="{StaticResource AccentSubtleBrush}"
+                                    Visibility="{Binding Console.IsDefault, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
+                                <StackPanel Orientation="Horizontal" TextElement.Foreground="{StaticResource AccentTextBrush}">
+                                    <TextBlock Text="&#xE735;" Style="{StaticResource IconText}" FontSize="12" Foreground="{StaticResource AccentTextBrush}"/>
+                                    <TextBlock Text="Default console" FontSize="12" FontWeight="SemiBold" Margin="6,0,0,0" VerticalAlignment="Center"
+                                               Foreground="{StaticResource AccentTextBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <Ellipse Width="8" Height="8" VerticalAlignment="Center" Style="{StaticResource StatusDot}"/>
+                            <TextBlock Text="{Binding Console.StatusText}" Margin="8,0,0,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Grid Grid.Column="2" VerticalAlignment="Center">
+                        <Button Style="{StaticResource OutlineButton}" Height="32" Content="Set as default"
+                                ToolTip="Visual Studio .NET 2003 and the XDK tools use the default console"
+                                Command="{Binding DataContext.Consoles.SetDefaultCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding Console}"
+                                Visibility="{Binding Console.IsDefault, Converter={StaticResource InverseBoolToVis}}"/>
+                        <Button Style="{StaticResource OutlineButton}" Height="32" Content="Remove as default"
+                                Command="{Binding DataContext.Consoles.RemoveDefaultCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding Console}"
+                                Visibility="{Binding Console.IsDefault, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"/>
+                    </Grid>
+
+                    <Button Grid.Column="3" Style="{StaticResource IconButton}" Margin="4,0,0,0" VerticalAlignment="Center"
+                            ToolTip="Refresh (F5)" AutomationProperties.Name="Refresh" Command="{Binding RefreshCommand}">
+                        <TextBlock Text="&#xE72C;" Style="{StaticResource IconText}" FontSize="14"/>
+                    </Button>
+                </Grid>
+
+                <!-- XDK version differs from the PC -->
+                <Border Margin="0,4,0,0" Padding="16,6,6,6" CornerRadius="4" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                        Visibility="{Binding VersionMessage, Converter={StaticResource NotEmptyToVis}}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{StaticResource InfoBarBackgroundBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsVersionWarning}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource WarningSubtleBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <DockPanel>
+                        <Border DockPanel.Dock="Left" Width="16" Height="16" CornerRadius="8" VerticalAlignment="Top" Margin="0,8,0,0">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsVersionWarning}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource WarningBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="i"/>
+                                        <Setter Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsVersionWarning}" Value="True">
+                                                <Setter Property="Text" Value="!"/>
+                                                <Setter Property="Foreground" Value="#1C1C1C"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Width="32" VerticalAlignment="Top"
+                                ToolTip="Hide until the app restarts" Command="{Binding DismissVersionBarCommand}">
+                            <TextBlock Text="&#xE711;" Style="{StaticResource IconText}" FontSize="11"/>
+                        </Button>
+                        <TextBlock Text="{Binding VersionMessage}" Margin="12,6" LineHeight="20" TextWrapping="Wrap"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- Cards -->
+                <StackPanel Visibility="{Binding IsReady, Converter={StaticResource BoolToVis}}">
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="General" Style="{StaticResource CardTitle}"/>
+                            <Grid Margin="0,12,0,-10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="IP address" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Console.Address}" Style="{StaticResource FieldValue}"/>
+
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,16,10">
+                                    <TextBlock Text="Title IP address" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="&#xE946;" Style="{StaticResource IconText}" FontSize="13" Margin="6,0,0,0" Cursor="Help"
+                                               Foreground="{StaticResource TextTertiaryBrush}" Background="Transparent"
+                                               ToolTip="Second address of the console. Titles use it on the network, debugging uses the first one."/>
+                                </StackPanel>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TitleAddressText}" Style="{StaticResource FieldValue}"/>
+
+                                <TextBlock Grid.Row="2" Text="Current title" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RunningTitleText}" Style="{StaticResource FieldValue}"/>
+
+                                <TextBlock Grid.Row="3" Text="Console XDK" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ConsoleXdkText}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource FieldValue}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsConsoleXdkOlder}" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <TextBlock Grid.Row="4" Text="PC XDK" Style="{StaticResource FieldLabel}"/>
+                                <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,0,0,10">
+                                    <TextBlock Text="{Binding PcXdkText}"/>
+                                    <TextBlock Text="{Binding PcXdkFolder}" Style="{StaticResource CaptionText}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Drives" Style="{StaticResource CardTitle}"/>
+                            <ItemsControl ItemsSource="{Binding Console.Drives}" Margin="0,12,-8,-8">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="3"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:DriveViewModel}">
+                                        <Button Style="{StaticResource TileButton}" Margin="0,0,8,8" ToolTip="{Binding ToolTipText}"
+                                                AutomationProperties.Name="{Binding Label}"
+                                                Command="{Binding DataContext.OpenDriveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Label}" FontSize="20" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Name}" FontSize="13" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                <ProgressBar x:Name="UsageBar" Style="{StaticResource ThinProgressBar}" Height="4" Margin="0,10,0,0"
+                                                             Value="{Binding UsedFraction, Mode=OneWay}"/>
+                                                <TextBlock Text="{Binding SpaceText}" Style="{StaticResource CaptionText}" Margin="0,6,0,0"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsAlmostFull}" Value="True">
+                                                <Setter TargetName="UsageBar" Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Height="32" Content="Reboot"
+                                        VerticalAlignment="Center" Command="{Binding RebootCommand}"/>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center"
+                                            Visibility="{Binding IsRebooting, Converter={StaticResource BoolToVis}}">
+                                    <ProgressBar IsIndeterminate="True" Width="60" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Rebooting …" Margin="10,0,0,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding RebootMessage}" Margin="0,0,16,0" MaxWidth="320"
+                                           VerticalAlignment="Center" TextWrapping="Wrap"
+                                           Visibility="{Binding RebootMessage, Converter={StaticResource NotEmptyToVis}}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRebootError}" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource ErrorBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <StackPanel>
+                                    <TextBlock Text="Reboot" Style="{StaticResource CardTitle}"/>
+                                    <TextBlock Text="Reboot the console." Style="{StaticResource CardText}"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <Border Style="{StaticResource CardDivider}"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                
+                                <RadioButton Content="Warm" MinWidth="0" GroupName="RebootKind" IsChecked="{Binding IsWarmReboot}"
+                                             ToolTip="Restarts the software without resetting the hardware"/>
+                                
+                                <RadioButton Content="Cold" MinWidth="0" GroupName="RebootKind" IsChecked="{Binding IsColdReboot}" Margin="28,0,0,0"
+                                             ToolTip="Restarts the console like turning it off and on"/>
+                                
+                                <Border Width="1" Height="20" Margin="28,0" Background="{StaticResource StrokeStrongBrush}"/>
+                                
+                                <CheckBox Content="Restart the currently running title" IsChecked="{Binding RestartTitle}"
+                                          IsEnabled="{Binding HasRunningTitle}" ToolTipService.ShowOnDisabled="True"
+                                          ToolTip="Only possible while a title runs, not on the dashboard"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Height="32" Content="Capture"
+                                        VerticalAlignment="Center" Command="{Binding CaptureCommand}"/>
+                                
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center"
+                                            Visibility="{Binding IsCapturing, Converter={StaticResource BoolToVis}}">
+                                    
+                                    <ProgressBar IsIndeterminate="True" Width="60" VerticalAlignment="Center"/>
+                                    
+                                    <TextBlock Text="Capturing …" Margin="10,0,0,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    
+                                </StackPanel>
+                                
+                                <StackPanel>
+                                    <TextBlock Text="Screen capture" Style="{StaticResource CardTitle}"/>
+                                    <TextBlock Text="Save a snapshot of what the console currently displays." Style="{StaticResource CardText}"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <StackPanel Visibility="{Binding CapturePath, Converter={StaticResource NotEmptyToVis}}">
+                                
+                                <Border Style="{StaticResource CardDivider}"/>
+                                
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="Open folder" Margin="16,0,0,0"
+                                            Command="{Binding OpenCaptureFolderCommand}"/>
+                                    
+                                    <TextBlock TextTrimming="CharacterEllipsis" ToolTip="{Binding CapturePath}">
+                                        <Run Text="Saved to " Foreground="{StaticResource TextSecondaryBrush}"/><Run Text="{Binding CapturePath, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    
+                                </DockPanel>
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding CaptureError}" Style="{StaticResource ErrorText}"
+                                       Visibility="{Binding CaptureError, Converter={StaticResource NotEmptyToVis}}"/>
+                            
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <DockPanel>
+                                
+                                <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Height="32" Content="Sync time"
+                                        VerticalAlignment="Center" Command="{Binding SyncClockCommand}"/>
+                                
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center"
+                                            Visibility="{Binding IsClockInSync, Converter={StaticResource BoolToVis}}">
+                                    
+                                    <TextBlock Text="&#xE73E;" Style="{StaticResource IconText}" FontSize="13" Foreground="{StaticResource SuccessBrush}"/>
+                                   
+                                    <TextBlock Text="In sync" Margin="6,0,0,0" Foreground="{StaticResource SuccessBrush}"/>
+                                </StackPanel>
+                                
+                                <StackPanel>
+                                    <TextBlock Text="Clock" Style="{StaticResource CardTitle}"/>
+                                    <TextBlock Text="Set the console clock to the time of this PC." Style="{StaticResource CardText}"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <Border Style="{StaticResource CardDivider}"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock>
+                                    <Run Text="Console: " Foreground="{StaticResource TextSecondaryBrush}"/><Run Text="{Binding ConsoleTimeText, Mode=OneWay}">
+                                        <Run.Style>
+                                            <Style TargetType="Run">
+                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsClockInSync}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Run.Style>
+                                    </Run>
+                                </TextBlock>
+                                <TextBlock Margin="32,0,0,0">
+                                    <Run Text="PC: " Foreground="{StaticResource TextSecondaryBrush}"/><Run Text="{Binding PcTimeText, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding ClockError}" Style="{StaticResource ErrorText}"
+                                       Visibility="{Binding ClockError, Converter={StaticResource NotEmptyToVis}}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Security" Style="{StaticResource CardTitle}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <TextBlock FontSize="16" Foreground="{StaticResource TextSecondaryBrush}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource IconText}">
+                                            <Setter Property="Text" Value="&#xE785;"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                    <Setter Property="Text" Value="&#xE72E;"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding SecurityText}" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Text="Locking and user management are not supported yet." Style="{StaticResource CaptionText}" Margin="0,12,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Loading -->
+                <StackPanel Visibility="{Binding ShowSkeleton, Converter={StaticResource BoolToVis}}">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Border Style="{StaticResource SkeletonBar}" Width="90"/>
+                            <Grid Margin="0,16,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="90" Margin="0,0,0,14"/>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="110" Margin="0,0,0,14"/>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="100" Margin="0,0,0,14"/>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="86"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <Border Style="{StaticResource SkeletonBar}" Width="130" Margin="0,0,0,14"/>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="100" Margin="0,0,0,14"/>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="260" Margin="0,0,0,14"/>
+                                    <Border Style="{StaticResource SkeletonBar}" Width="120"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Border Style="{StaticResource SkeletonBar}" Width="70"/>
+                            <UniformGrid Columns="3" Margin="0,16,-8,0">
+                                <Border Height="104" CornerRadius="4" Background="#0AFFFFFF" Margin="0,0,8,0"/>
+                                <Border Height="104" CornerRadius="4" Background="#0AFFFFFF" Margin="0,0,8,0"/>
+                                <Border Height="104" CornerRadius="4" Background="#0AFFFFFF" Margin="0,0,8,0"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Border Style="{StaticResource SkeletonBar}" Width="80"/>
+                            <Border Style="{StaticResource SkeletonBar}" Width="220" Margin="0,14,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Offline -->
+                <Grid Margin="0,12,0,0" Visibility="{Binding IsOffline, Converter={StaticResource BoolToVis}}">
+                    <Rectangle RadiusX="6" RadiusY="6" Stroke="{StaticResource StrokeStrongBrush}" StrokeThickness="1" StrokeDashArray="4 3"/>
+                    <StackPanel Margin="40,56" HorizontalAlignment="Center" MaxWidth="440">
+                        <Border Width="56" Height="56" CornerRadius="28" Background="{StaticResource SubtleFillBrush}">
+                            <TextBlock Text="&#xEB55;" Style="{StaticResource IconText}" FontSize="22" Foreground="{StaticResource TextTertiaryBrush}"/>
+                        </Border>
+                        <TextBlock Text="Console not reachable" FontSize="20" FontWeight="SemiBold" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding OfflineText}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Center" Margin="0,16,0,0" Command="{Binding RefreshCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE72C;" Style="{StaticResource IconText}" FontSize="12" Margin="0,0,8,0"/>
+                                <TextBlock Text="Try again"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

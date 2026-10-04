@@ -1,0 +1,16 @@
+# Build and publish output
+bin/
+obj/
+
+# Visual Studio and other IDEs, per-user settings
+.vs/
+*.user
+*.suo
+.idea/
+.vscode/
+
+# Release archives made by hand or by the workflow
+*.zip
+
+# Test results
+TestResults/

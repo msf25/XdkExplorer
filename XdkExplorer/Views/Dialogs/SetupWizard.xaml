@@ -1,0 +1,141 @@
+<Window x:Class="XdkExplorer.Views.SetupWizard"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:XdkExplorer.Views"
+        xmlns:design="clr-namespace:XdkExplorer.Design"
+        mc:Ignorable="d"
+        d:DataContext="{x:Static design:DesignData.Wizard}"
+        Title="XDK Explorer – Setup" Width="560" Height="440" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource ContentBackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}">
+
+    <Window.Resources>
+        <Style x:Key="StepTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,4,0,18"/>
+        </Style>
+
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel Margin="28,22,28,22">
+
+        <!-- Footer -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,18,0,0">
+            <Button DockPanel.Dock="Left" Content="Back" Style="{StaticResource OutlineButton}" Height="32" MinWidth="80"
+                    Command="{Binding BackCommand}" Visibility="{Binding CanGoBack, Converter={StaticResource BoolToVis}}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Skip" Style="{StaticResource OutlineButton}" Height="32" MinWidth="80" Margin="0,0,8,0"
+                        Command="{Binding SkipCommand}" Visibility="{Binding IsConsoleStep, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="Next" Style="{StaticResource AccentButton}" MinWidth="100" Command="{Binding NextCommand}"
+                        Visibility="{Binding IsDoneStep, Converter={StaticResource InverseBoolToVis}}"/>
+                <Button Content="Get started" Style="{StaticResource AccentButton}" MinWidth="120" Command="{Binding FinishCommand}"
+                        Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+        </DockPanel>
+
+        <TextBlock DockPanel.Dock="Top" Text="{Binding StepText}" Style="{StaticResource CaptionText}"/>
+
+        <Grid>
+            <!-- Step 1: XDK -->
+            <StackPanel Visibility="{Binding IsXdkStep, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="Xbox Development Kit" Style="{StaticResource StepTitle}"/>
+
+                <Border Style="{StaticResource Card}" Visibility="{Binding IsXdkFound, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE73E;" Style="{StaticResource IconText}" FontSize="13" Foreground="{StaticResource SuccessBrush}"/>
+                            <TextBlock Text="XDK found" FontWeight="SemiBold" Margin="8,0,0,0"/>
+                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="DLL" Style="{StaticResource CaptionText}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Xdk.DllPath}" TextWrapping="Wrap" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="1" Text="Version" Style="{StaticResource CaptionText}" Margin="0,6,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding XdkVersionText}" Margin="0,6,0,0"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}" Visibility="{Binding IsXdkFound, Converter={StaticResource InverseBoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="XDK not found" FontWeight="SemiBold"/>
+                        <TextBlock Text="XDK Explorer needs xboxdbg.dll from the Xbox Development Kit." TextWrapping="Wrap" Margin="0,6,0,0"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="{Binding XdkError}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" Margin="0,10,0,0"
+                           Visibility="{Binding XdkError, Converter={StaticResource NotEmptyToVis}}"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,14,0,0"
+                            Visibility="{Binding IsXdkLocked, Converter={StaticResource InverseBoolToVis}}">
+                    <Button Style="{StaticResource OutlineButton}" Height="32" Content="Choose folder …" Command="{Binding ChooseFolderCommand}"/>
+                    <Button Style="{StaticResource OutlineButton}" Height="32" Margin="8,0,0,0" Content="Search again"
+                            Command="{Binding SearchAgainCommand}"/>
+                </StackPanel>
+                <TextBlock Style="{StaticResource CaptionText}" Margin="0,14,0,0" TextWrapping="Wrap"
+                           Text="Subfolders are searched as well. A second installation can be picked here or later in the settings."
+                           Visibility="{Binding IsXdkLocked, Converter={StaticResource InverseBoolToVis}}"/>
+                <TextBlock Style="{StaticResource CaptionText}" Margin="0,14,0,0" TextWrapping="Wrap"
+                           Text="This XDK is in use now. A different one can be chosen in the settings, it is used after a restart."
+                           Visibility="{Binding IsXdkLocked, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+
+            <!-- Step 2: first console -->
+            <StackPanel Visibility="{Binding IsConsoleStep, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="Add a first console" Style="{StaticResource StepTitle}"/>
+                <TextBlock Text="Optional. More consoles can be added later at any time." Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,-10,0,16"/>
+                <views:ConsoleConnectForm DataContext="{Binding Connect}"/>
+            </StackPanel>
+
+            <!-- Step 3: done -->
+            <StackPanel Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="All set" Style="{StaticResource StepTitle}"/>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Text="&#xE73E;" Style="{StaticResource IconText}" FontSize="13"
+                                       VerticalAlignment="Top" Margin="0,3,10,0" Foreground="{StaticResource SuccessBrush}"/>
+                            <StackPanel>
+                                <TextBlock>
+                                    <Run Text="Xbox Development Kit"/>
+                                    <Run Text="{Binding XdkVersionText, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Text="{Binding Xdk.DllPath}" Style="{StaticResource CaptionText}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </DockPanel>
+                        <DockPanel Margin="0,12,0,0">
+                            <TextBlock DockPanel.Dock="Left" Text="&#xE73E;" Style="{StaticResource IconText}" FontSize="13"
+                                       VerticalAlignment="Top" Margin="0,3,10,0" Foreground="{StaticResource SuccessBrush}"/>
+                            <TextBlock Text="{Binding ConsoleSummary}" TextWrapping="Wrap"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Style="{StaticResource CaptionText}" Margin="0,14,0,0" TextWrapping="Wrap"
+                           Text="The XDK path and the default console can be changed later in the settings and the sidebar."/>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
