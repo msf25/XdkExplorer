@@ -34,6 +34,7 @@
     <SolidColorBrush x:Key="StrokeStrongBrush" Color="#1AFFFFFF"/>
     <SolidColorBrush x:Key="DividerBrush" Color="#0FFFFFFF"/>
     <SolidColorBrush x:Key="TrackBrush" Color="#1FFFFFFF"/>
+    <SolidColorBrush x:Key="ControlStrokeBrush" Color="#8BFFFFFF"/>
 
     <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#1C241C" Offset="0"/>

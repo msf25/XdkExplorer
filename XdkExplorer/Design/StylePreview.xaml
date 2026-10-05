@@ -121,6 +121,22 @@
                 <ProgressBar Style="{StaticResource ThinProgressBar}" Value="0.38" Foreground="{StaticResource ErrorBrush}"/>
             </StackPanel>
 
+            <!-- Implicit RadioButton and CheckBox styles -->
+            <TextBlock Text="RadioButton, CheckBox" Style="{StaticResource SectionTitle}"/>
+            <WrapPanel>
+                <RadioButton Content="Checked" GroupName="Preview" IsChecked="True" Margin="0,0,24,8"/>
+                <RadioButton Content="Unchecked" GroupName="Preview" Margin="0,0,24,8"/>
+                <RadioButton Content="Disabled" IsChecked="True" IsEnabled="False" Margin="0,0,24,8"/>
+                <RadioButton Content="Disabled" IsEnabled="False" Margin="0,0,24,8"/>
+            </WrapPanel>
+            <WrapPanel>
+                <CheckBox Content="Checked" IsChecked="True" Margin="0,0,24,8"/>
+                <CheckBox Content="Unchecked" Margin="0,0,24,8"/>
+                <CheckBox Content="Indeterminate" IsChecked="{x:Null}" Margin="0,0,24,8"/>
+                <CheckBox Content="Disabled" IsChecked="True" IsEnabled="False" Margin="0,0,24,8"/>
+                <CheckBox Content="Disabled" IsEnabled="False" Margin="0,0,24,8"/>
+            </WrapPanel>
+
             <!-- Text -->
             <TextBlock Text="Text" Style="{StaticResource SectionTitle}"/>
             <TextBlock Text="Primary text"/>
