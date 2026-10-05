@@ -16,6 +16,9 @@ public sealed partial class TransfersViewModel : ObservableObject
     /// <summary>A job created, finished or removed something on a console. Also raised after the job left the list.</summary>
     public event EventHandler<RemoteChange>? RemoteContentChanged;
 
+    /// <summary>A job completed, failed for good or was cancelled.</summary>
+    public event EventHandler<TransferJobViewModel>? JobFinished;
+
     public ObservableCollection<TransferJobViewModel> Jobs { get; } = new();
 
     public bool HasJobs => Jobs.Count > 0;
@@ -46,7 +49,11 @@ public sealed partial class TransfersViewModel : ObservableObject
     public void Enqueue(TransferJobViewModel job)
     {
         job.PropertyChanged += OnJobChanged;
-        job.Finished += (_, _) => StartWaitingJobs();
+        job.Finished += (_, _) =>
+        {
+            StartWaitingJobs();
+            JobFinished?.Invoke(this, job);
+        };
         job.DismissRequested += (_, _) => Remove(job);
         job.RemoteContentChanged += (_, change) => RemoteContentChanged?.Invoke(this, change);
 

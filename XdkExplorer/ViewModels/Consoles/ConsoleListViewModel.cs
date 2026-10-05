@@ -332,6 +332,11 @@ public sealed partial class ConsoleListViewModel : ObservableObject
             {
                 OnlineStateChanged?.Invoke(this, console);
             }
+            else if (console == SelectedConsole)
+            {
+                // Titles started on the console mount and release drives (e.g. Z:), and free space changes
+                await console.RefreshDrivesAsync();
+            }
         }
     }
 

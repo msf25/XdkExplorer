@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -29,6 +30,7 @@ public sealed partial class FileBrowserViewModel : ObservableObject
     private static readonly TimeSpan MinReloadInterval = TimeSpan.FromSeconds(1);
 
     private readonly XbdmWorker _worker;
+    private readonly InfoBarViewModel _infoBar;
     private readonly NavigationHistory _history = new();
     private int _navigationVersion;
     private bool _isReloadScheduled;
@@ -71,6 +73,7 @@ public sealed partial class FileBrowserViewModel : ObservableObject
         TransfersViewModel transfers)
     {
         _worker = worker;
+        _infoBar = infoBar;
 
         Actions = new FileActionsViewModel(worker, settings, dialogs, infoBar, transfers, this);
 
@@ -171,12 +174,36 @@ public sealed partial class FileBrowserViewModel : ObservableObject
         if (oldValue != null)
         {
             oldValue.PropertyChanged -= OnConsolePropertyChanged;
+            oldValue.Drives.CollectionChanged -= OnDrivesChanged;
         }
 
         if (newValue != null)
         {
             newValue.PropertyChanged += OnConsolePropertyChanged;
+            newValue.Drives.CollectionChanged += OnDrivesChanged;
         }
+    }
+
+    /// <summary>A title on the console released the drive that is open here, e.g. Z:. The overview shows what is left.</summary>
+    private async void OnDrivesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action != NotifyCollectionChangedAction.Remove || e.OldItems == null || CurrentPath == null || Console == null)
+        {
+            return;
+        }
+
+        var gone = e.OldItems.Cast<DriveViewModel>()
+            .FirstOrDefault(d => CurrentPath.StartsWith(d.RootPath, StringComparison.OrdinalIgnoreCase));
+
+        if (gone == null)
+        {
+            return;
+        }
+
+        _infoBar.Show($"{gone.Label} is no longer available on {Console.DisplayName}.");
+
+        // Navigating to the overview does not throw, so this async void handler is safe
+        await NavigateAsync(null, true);
     }
 
     private void OnConsolePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -403,6 +430,12 @@ public sealed partial class FileBrowserViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(HasConsole))]
     private async Task RefreshAsync()
     {
+        // The overview refreshes the whole console itself
+        if (CurrentPath != null && Console != null)
+        {
+            await Console.RefreshDrivesAsync();
+        }
+
         await NavigateAsync(CurrentPath, false);
     }
 

@@ -6,7 +6,7 @@ namespace XdkExplorer.ViewModels;
 
 public sealed partial class DriveViewModel : ObservableObject
 {
-    private readonly XboxDrive _drive;
+    private XboxDrive _drive;
 
     [ObservableProperty]
     public partial bool IsSelected { get; set; }
@@ -40,6 +40,15 @@ public sealed partial class DriveViewModel : ObservableObject
     public double UsedFraction => Total == 0 ? 0 : 1.0 - (double)Free / Total;
 
     public bool IsAlmostFull => UsedFraction > 0.9;
+
+    /// <summary>Takes over new name and space of the same letter, e.g. after a title mounted another utility partition.</summary>
+    public void Update(XboxDrive drive)
+    {
+        _drive = drive;
+
+        // Everything except IsSelected derives from the drive
+        OnPropertyChanged(string.Empty);
+    }
 
     /// <summary>Sort key that puts E: first, since that is where dev builds live.</summary>
     public int SortOrder => Letter == 'E' ? 0 : Letter;

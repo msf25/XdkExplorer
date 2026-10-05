@@ -134,6 +134,24 @@ public sealed partial class ConsoleViewModel : ObservableObject
         }
     }
 
+    /// <summary>Reads drives and free space again. Does nothing while the console is offline or rebooting.</summary>
+    public async Task RefreshDrivesAsync()
+    {
+        if (!IsOnline || IsRebooting)
+        {
+            return;
+        }
+
+        try
+        {
+            UpdateDrives(await _worker.RunAsync(Target, XbdmCommands.GetDriveDetails));
+        }
+        catch (XbdmException)
+        {
+            // A lost console is noticed by the periodic check or the next navigation
+        }
+    }
+
     /// <summary>Cheap periodic check. Only consoles with a known IP are probed, the rest wait for a manual refresh.</summary>
     public async Task ProbeAsync()
     {
@@ -263,16 +281,39 @@ public sealed partial class ConsoleViewModel : ObservableObject
         return false;
     }
 
+    /// <summary>
+    /// Merges the drives into the list instead of rebuilding it, so a periodic refresh does not make the sidebar flicker.
+    /// Titles mount and release drives (e.g. Z:), so letters can come and go.
+    /// </summary>
     private void UpdateDrives(IEnumerable<XboxDrive> drives)
     {
-        char? selected = Drives.FirstOrDefault(d => d.IsSelected)?.Letter;
+        var fresh = drives.ToDictionary(d => d.Letter);
 
-        Drives.Clear();
-
-        foreach (var drive in drives.Select(d => new DriveViewModel(this, d)).OrderBy(d => d.SortOrder))
+        foreach (var gone in Drives.Where(d => !fresh.ContainsKey(d.Letter)).ToList())
         {
-            drive.IsSelected = drive.Letter == selected;
-            Drives.Add(drive);
+            Drives.Remove(gone);
+        }
+
+        foreach (var drive in fresh.Values)
+        {
+            var existing = Drives.FirstOrDefault(d => d.Letter == drive.Letter);
+
+            if (existing != null)
+            {
+                existing.Update(drive);
+
+                continue;
+            }
+
+            var added = new DriveViewModel(this, drive);
+            int index = 0;
+
+            while (index < Drives.Count && Drives[index].SortOrder < added.SortOrder)
+            {
+                index++;
+            }
+
+            Drives.Insert(index, added);
         }
     }
 }

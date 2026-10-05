@@ -49,6 +49,15 @@ public sealed partial class MainViewModel
         Overview.DriveSelected += (_, drive) => Consoles.SelectDriveCommand.Execute(drive);
 
         Transfers.RemoteContentChanged += async (_, change) => await Browser.HandleRemoteChangeAsync(change);
+
+        // Uploads change the free space shown in the sidebar and on the overview
+        Transfers.JobFinished += async (_, job) =>
+        {
+            if (job.Kind == TransferKind.Upload)
+            {
+                await job.Console.RefreshDrivesAsync();
+            }
+        };
     }
 
     public ConsoleListViewModel Consoles { get; }
