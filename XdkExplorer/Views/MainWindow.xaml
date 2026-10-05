@@ -43,21 +43,33 @@
                     </Grid.RowDefinitions>
 
                     <views:NavigationBar DataContext="{Binding Browser}"/>
+
                     <Border Grid.Row="1" Height="44" Visibility="{Binding Browser.ShowFileTools, Converter={StaticResource BoolToVis}}">
                         <views:FileToolbar DataContext="{Binding Browser.Actions}"/>
                     </Border>
+
                     <views:InfoBar Grid.Row="2" DataContext="{Binding InfoBar}"/>
-                    <views:FileListView Grid.Row="3" DataContext="{Binding Browser}"
-                                        BottomInset="{Binding ActualHeight, ElementName=Transfers}"/>
+
+                    <views:FileListView Grid.Row="3" DataContext="{Binding Browser}"/>
+
                     <views:ConsoleOverviewView Grid.Row="3" DataContext="{Binding Overview}"
                                                BottomInset="{Binding ActualHeight, ElementName=Transfers}"/>
 
                 </Grid>
 
-                <views:TransferPanel x:Name="Transfers" DataContext="{Binding Transfers}"
-                             VerticalAlignment="Bottom"
-                             HorizontalAlignment="Stretch"
-                             Panel.ZIndex="1"/>
+                <Grid VerticalAlignment="Bottom" Panel.ZIndex="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1000*" MaxWidth="850"/>
+                    </Grid.ColumnDefinitions>
+
+                    <views:TransferPanel Grid.Column="1"
+                                         Margin="16 0"
+                                         x:Name="Transfers"
+                                         DataContext="{Binding Transfers}"/>
+                </Grid>
+
+
             </Grid>
 
         </Border>

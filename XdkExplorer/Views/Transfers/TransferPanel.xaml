@@ -13,7 +13,7 @@
              Foreground="{StaticResource TextPrimaryBrush}"
              Visibility="{Binding HasJobs, Converter={StaticResource BoolToVis}}">
 
-    <Border Margin="12,0,12,12" CornerRadius="6" Background="{StaticResource CardBackgroundBrush}"
+    <Border Margin="16" CornerRadius="6" Background="{StaticResource CardBackgroundBrush}"
             BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
         <DockPanel>
             <!-- Header, doubles as the collapsed bar -->
@@ -54,7 +54,7 @@
             <ScrollViewer MaxHeight="224" VerticalScrollBarVisibility="Auto" Padding="16,0"
                           BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,1,0,0"
                           Visibility="{Binding IsOpen, Converter={StaticResource BoolToVis}}">
-                <ItemsControl ItemsSource="{Binding Jobs}">
+                <ItemsControl ItemsSource="{Binding Jobs}" Grid.IsSharedSizeScope="True">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:TransferJobViewModel}">
                             <views:TransferJobItem/>

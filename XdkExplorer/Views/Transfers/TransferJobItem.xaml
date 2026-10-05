@@ -6,7 +6,7 @@
              xmlns:design="clr-namespace:XdkExplorer.Design"
              mc:Ignorable="d"
              d:DataContext="{x:Static design:DesignData.RunningUpload}"
-             d:DesignWidth="960"
+             d:DesignWidth="1080"
              d:Background="{StaticResource CardBackgroundBrush}"
              Foreground="{StaticResource TextPrimaryBrush}">
 
@@ -74,68 +74,107 @@
         </Style>
     </UserControl.Resources>
 
-    <Border BorderBrush="{StaticResource SubtleFillBrush}" BorderThickness="0,0,0,1" Padding="0,10">
+    <Border BorderBrush="{StaticResource SubtleFillBrush}" BorderThickness="0,0,0,1" Padding="0 8">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="32"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1000*" MaxWidth="380"/>
+                <ColumnDefinition Width="160"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="180"/>
-                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="JobButtons"/>
             </Grid.ColumnDefinitions>
 
-            <Border Width="32" Height="32" CornerRadius="16" Style="{StaticResource IconCircleStyle}">
+            <Border Margin="10 0"
+                Width="32" Height="32" 
+                    CornerRadius="16" Style="{StaticResource IconCircleStyle}">
                 <TextBlock Style="{StaticResource JobIconStyle}"/>
             </Border>
 
-            <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
-                <TextBlock TextTrimming="CharacterEllipsis">
+            <StackPanel Grid.Column="1" Margin="14 0" VerticalAlignment="Center">
+                <TextBlock TextTrimming="CharacterEllipsis" ToolTip="{Binding RouteText}">
                     <Run Text="{Binding Label, Mode=OneWay}" FontWeight="SemiBold"/>
                     <Run Text="  "/>
                     <Run Text="{Binding RouteText, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextTertiaryBrush}"/>
                 </TextBlock>
 
+
                 <ProgressBar Style="{StaticResource JobBarStyle}" Margin="0,5,0,0" Value="{Binding Progress, Mode=OneWay}"
                              Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVis}}"/>
 
-                <StackPanel Orientation="Horizontal" Margin="0,5,0,0"
-                            Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVis}}">
+                <Grid Margin="0,5,0,0" 
+                      HorizontalAlignment="Left"
+                      Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVis}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
                     <TextBlock Text="{Binding CountText}" Style="{StaticResource CaptionText}" Margin="0,0,10,0"
                                Visibility="{Binding CountText, Converter={StaticResource NotEmptyToVis}}"/>
-                    
-                    <TextBlock Text="{Binding CurrentFileName}" FontSize="12" MaxWidth="260"
-                               Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
-                    
-                    <ProgressBar Style="{StaticResource ThinProgressBar}" Width="80" Height="2" Margin="10,0,0,0"
+
+                    <TextBlock Grid.Column="1" Text="{Binding CurrentFileName}" 
+                               d:Text="Really really really long filename.exe"
+                               FontSize="12" MaxWidth="260" Foreground="{StaticResource TextSecondaryBrush}"
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <ProgressBar Grid.Column="2" Style="{StaticResource ThinProgressBar}" 
+                                 Width="80" Height="2" Margin="10,0,0,0"
                                  VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"
                                  Value="{Binding CurrentFileProgress, Mode=OneWay}"/>
 
-                    <TextBlock Text="{Binding CurrentFileProgressText}" FontSize="12" MaxWidth="260" Margin="8,0,0,0"
-                               Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
-
-                </StackPanel>
+                    <TextBlock Grid.Column="3" 
+                               Text="{Binding CurrentFileProgressText}" 
+                               FontSize="12" Margin="8,0,0,0"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </Grid>
 
                 <TextBlock Text="{Binding DetailText}" FontSize="12" Margin="0,5,0,0" TextWrapping="Wrap" Style="{StaticResource DetailStyle}"
                            Visibility="{Binding DetailText, Converter={StaticResource NotEmptyToVis}}"/>
             </StackPanel>
 
-            <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
-                <TextBlock Text="{Binding BytesText}" FontSize="12" HorizontalAlignment="Right"
+            <StackPanel Grid.Column="2" 
+                        Margin="0 0 10 0" 
+                        VerticalAlignment="Center" HorizontalAlignment="Right"
+                        Typography.NumeralAlignment="Tabular">
+
+                <TextBlock Text="{Binding BytesText}" FontSize="12" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"
                            Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVis}}"/>
-                <TextBlock Text="{Binding RateText}" Style="{StaticResource CaptionText}" HorizontalAlignment="Right"/>
+
+                <TextBlock Text="{Binding RateText}" Style="{StaticResource CaptionText}" HorizontalAlignment="Right"
+                           TextTrimming="CharacterEllipsis"/>
+
             </StackPanel>
 
-            <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Style="{StaticResource AccentButton}" Height="30" Padding="12,0" Content="Retry" Command="{Binding RetryCommand}"
+            <StackPanel Grid.Column="4"
+                        Margin="10 0"
+                        
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Center">
+
+                <Button Style="{StaticResource AccentButton}" Height="30" Padding="12 0" 
+                        Margin="0,0,6,0"
+                        Content="Retry" Command="{Binding RetryCommand}"
                         Visibility="{Binding IsError, Converter={StaticResource BoolToVis}}"/>
-                <Button Style="{StaticResource OutlineButton}" Content="Skip" Margin="6,0,0,0" Command="{Binding SkipCommand}"
+
+                <Button Style="{StaticResource OutlineButton}" Content="Skip" Command="{Binding SkipCommand}"
                         Visibility="{Binding IsError, Converter={StaticResource BoolToVis}}"/>
-                <Button Style="{StaticResource OutlineButton}" Content="{Binding CancelText}" Margin="6,0,0,0" Command="{Binding CancelCommand}"
+
+                <Button Style="{StaticResource OutlineButton}" Content="{Binding CancelText}" Command="{Binding CancelCommand}"
                         Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"/>
+
                 <Button Style="{StaticResource IconButton}" Width="30" Height="30" ToolTip="Hide" Command="{Binding DismissCommand}"
                         Visibility="{Binding IsFinished, Converter={StaticResource BoolToVis}}">
+
                     <TextBlock Text="&#xE711;" Style="{StaticResource IconText}" FontSize="11"/>
+
                 </Button>
+
             </StackPanel>
+
+
         </Grid>
     </Border>
 </UserControl>
