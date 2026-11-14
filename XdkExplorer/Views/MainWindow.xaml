@@ -17,6 +17,8 @@
         <KeyBinding Key="Left" Modifiers="Alt" Command="{Binding Browser.BackCommand}"/>
         <KeyBinding Key="Right" Modifiers="Alt" Command="{Binding Browser.ForwardCommand}"/>
         <KeyBinding Key="Up" Modifiers="Alt" Command="{Binding Browser.UpCommand}"/>
+        <!-- Text boxes handle Backspace themselves, so it only reaches this binding outside of them -->
+        <KeyBinding Key="Back" Command="{Binding Browser.UpCommand}"/>
     </Window.InputBindings>
 
     <Grid>

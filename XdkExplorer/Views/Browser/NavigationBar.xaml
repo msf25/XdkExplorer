@@ -22,9 +22,6 @@
             <Button Style="{StaticResource IconButton}" Command="{Binding UpCommand}" ToolTip="Up (Alt+Up)" Margin="4,0,0,0">
                 <TextBlock Text="&#xE74A;" Style="{StaticResource IconText}" FontSize="14"/>
             </Button>
-            <Button Style="{StaticResource IconButton}" Command="{Binding RefreshCommand}" ToolTip="Refresh (F5)" Margin="4,0,0,0">
-                <TextBlock Text="&#xE72C;" Style="{StaticResource IconText}" FontSize="14"/>
-            </Button>
         </StackPanel>
 
         <!-- Filter -->
@@ -39,39 +36,46 @@
                        Visibility="{Binding Text, ElementName=FilterBox, Converter={StaticResource EmptyToVis}}"/>
         </Grid>
 
-        <!-- Breadcrumb -->
-        <Border Height="32" Margin="8,0" Padding="6,0" CornerRadius="4" VerticalAlignment="Center"
+        <!-- Breadcrumb. Refresh sits 3 px from the right edge, the same gap as above and below it. -->
+        <Border Height="32" Margin="8,0" Padding="6,0,3,0" CornerRadius="4" VerticalAlignment="Center"
                 Background="{StaticResource SubtleFillBrush}" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
-            <ItemsControl ItemsSource="{Binding Breadcrumbs}" VerticalAlignment="Center">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:Breadcrumb}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="Separator" Text="&#xE76C;" Style="{StaticResource IconText}" FontSize="9"
-                                       Margin="2,0" Foreground="#7A7A7A"/>
-                            <Button x:Name="CrumbButton" Style="{StaticResource SubtleButton}" Height="24" Padding="6,0"
-                                    Foreground="{StaticResource TextSecondaryBrush}"
-                                    Command="{Binding DataContext.NavigateCrumbCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}">
-                                <TextBlock x:Name="CrumbText" Text="{Binding Label}"/>
-                            </Button>
-                        </StackPanel>
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
-                                <Setter TargetName="Separator" Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsLast}" Value="True">
-                                <Setter TargetName="CrumbButton" Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-                                <Setter TargetName="CrumbText" Property="FontWeight" Value="SemiBold"/>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Width="24" Height="24" VerticalAlignment="Center"
+                        Command="{Binding RefreshCommand}" ToolTip="Refresh (F5)">
+                    <TextBlock Text="&#xE72C;" Style="{StaticResource IconText}" FontSize="12"/>
+                </Button>
+
+                <ItemsControl ItemsSource="{Binding Breadcrumbs}" VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:Breadcrumb}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="Separator" Text="&#xE76C;" Style="{StaticResource IconText}" FontSize="9"
+                                           Margin="2,0" Foreground="#7A7A7A"/>
+                                <Button x:Name="CrumbButton" Style="{StaticResource SubtleButton}" Height="24" Padding="6,0"
+                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                        Command="{Binding DataContext.NavigateCrumbCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock x:Name="CrumbText" Text="{Binding Label}"/>
+                                </Button>
+                            </StackPanel>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+                                    <Setter TargetName="Separator" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsLast}" Value="True">
+                                    <Setter TargetName="CrumbButton" Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                    <Setter TargetName="CrumbText" Property="FontWeight" Value="SemiBold"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DockPanel>
         </Border>
     </DockPanel>
 </UserControl>

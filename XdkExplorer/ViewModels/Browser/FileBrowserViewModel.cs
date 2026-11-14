@@ -85,6 +85,12 @@ public sealed partial class FileBrowserViewModel : ObservableObject
     /// <summary>The overview of the console was opened and should load its content.</summary>
     public event EventHandler<ConsoleViewModel>? OverviewRequested;
 
+    /// <summary>
+    /// A folder was listed after navigating. The argument is the folder the user came from when going up or back,
+    /// to be selected and focused in the list, otherwise null.
+    /// </summary>
+    public event EventHandler<FileItemViewModel?>? ListingShown;
+
     public FileActionsViewModel Actions { get; }
 
     public ObservableCollection<FileItemViewModel> Items { get; } = new();
@@ -504,6 +510,7 @@ public sealed partial class FileBrowserViewModel : ObservableObject
         }
 
         int version = ++_navigationVersion;
+        var previousPath = CurrentPath;
 
         CurrentPath = path;
         FilterText = "";
@@ -535,6 +542,7 @@ public sealed partial class FileBrowserViewModel : ObservableObject
             }
 
             ShowListing(console, path, entries);
+            ListingShown?.Invoke(this, FindChildToward(path, previousPath));
         }
         catch (XbdmException ex)
         {
@@ -580,6 +588,23 @@ public sealed partial class FileBrowserViewModel : ObservableObject
         SelectedItems = [];
 
         OnPropertyChanged(nameof(SelectionText));
+    }
+
+    private FileItemViewModel? FindChildToward(string folder, string? previousPath)
+    {
+        if (previousPath == null)
+        {
+            return null;
+        }
+
+        var name = XboxPath.GetChildToward(folder, previousPath);
+
+        if (name == null)
+        {
+            return null;
+        }
+
+        return Items.FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase));
     }
 
     private void RaiseConnectionChanged()
