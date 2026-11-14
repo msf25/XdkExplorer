@@ -6,6 +6,7 @@
         mc:Ignorable="d"
         d:Title="Remove console" Width="440" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
+        FocusManager.FocusedElement="{Binding ElementName=CancelButton}"
         Background="{StaticResource ContentBackgroundBrush}">
 
     <StackPanel Margin="24,20,24,20">
@@ -13,7 +14,7 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
             <Button x:Name="ConfirmButton" d:Content="Remove" Style="{StaticResource AccentButton}" MinWidth="90" Click="OnConfirm"/>
-            <Button Content="Cancel" Style="{StaticResource OutlineButton}" MinWidth="90" Height="32"
+            <Button x:Name="CancelButton" Content="Cancel" Style="{StaticResource OutlineButton}" MinWidth="90" Height="32"
                     Margin="8,0,0,0" IsCancel="True" IsDefault="True"/>
         </StackPanel>
     </StackPanel>

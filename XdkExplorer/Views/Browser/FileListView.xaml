@@ -12,8 +12,19 @@
              d:Background="{StaticResource ContentBackgroundBrush}"
              Foreground="{StaticResource TextPrimaryBrush}">
 
-    <!-- Transparent background so drops also work on an empty folder -->
-    <Grid Background="Transparent" AllowDrop="True" DragOver="OnDragOver" Drop="OnDrop">
+    <!-- Transparent background so drops and the background menu also work on an empty folder -->
+    <Grid x:Name="Root" Background="Transparent" AllowDrop="True" DragOver="OnDragOver" Drop="OnDrop"
+          ContextMenuOpening="OnBackgroundMenuOpening"
+          Focusable="True" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}">
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="New folder" Command="{Binding Actions.NewFolderCommand}"/>
+                <MenuItem Header="Upload …" Command="{Binding Actions.UploadCommand}"/>
+                <Separator/>
+                <MenuItem Header="Refresh" InputGestureText="F5" Command="{Binding RefreshCommand}"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -60,17 +71,17 @@
         </Grid>
 
         <!-- Listing -->
-        <ListBox x:Name="FileList" Grid.Row="1" Margin="6,0,6,4" ItemsSource="{Binding ItemsView}"
+        <views:FileListBox x:Name="FileList" Grid.Row="1" Margin="6,0,6,4" ItemsSource="{Binding ItemsView}"
                  SelectionMode="Extended" Background="Transparent" BorderThickness="0"
                  ItemContainerStyle="{StaticResource FileRowStyle}"
                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  Visibility="{Binding ShowList, Converter={StaticResource BoolToVis}}"
-                 SelectionChanged="OnSelectionChanged" MouseDoubleClick="OnDoubleClick">
+                 SelectionChanged="OnSelectionChanged" MouseDoubleClick="OnDoubleClick" PreviewKeyDown="OnListKeyDown"
+                 ContextMenuOpening="OnListMenuOpening">
             <ListBox.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding Actions.DeleteCommand}"/>
                 <KeyBinding Key="F2" Command="{Binding Actions.RenameCommand}"/>
-                <KeyBinding Key="Back" Command="{Binding UpCommand}"/>
             </ListBox.InputBindings>
             <ListBox.ContextMenu>
                 <ContextMenu>
@@ -125,7 +136,7 @@
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-        </ListBox>
+        </views:FileListBox>
 
         <!-- Loading -->
         <StackPanel Grid.Row="1" Margin="16,4,16,0" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">

@@ -7,6 +7,7 @@
         Title="File already exists"
         Width="480" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
+        FocusManager.FocusedElement="{Binding ElementName=SkipButton}"
         Background="{StaticResource ContentBackgroundBrush}">
 
     <StackPanel Margin="24,20,24,20">
@@ -19,7 +20,7 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,22,0,0">
             <Button Content="Replace" Style="{StaticResource AccentButton}" MinWidth="90" Click="OnReplace"/>
-            <Button Content="Skip" Style="{StaticResource OutlineButton}" MinWidth="90" Height="32"
+            <Button x:Name="SkipButton" Content="Skip" Style="{StaticResource OutlineButton}" MinWidth="90" Height="32"
                     Margin="8,0,0,0" IsDefault="True" Click="OnSkip"/>
             <Button Content="Cancel transfer" Style="{StaticResource OutlineButton}" Height="32"
                     Margin="8,0,0,0" IsCancel="True"/>

@@ -34,6 +34,30 @@ public static class XboxPath
         return slash < 0 ? trimmed : trimmed[(slash + 1)..];
     }
 
+    /// <summary>
+    /// Name of the entry in folder that leads to path, e.g. "Samples" for E:\ and E:\Samples\Gamepad.
+    /// Null if path is not below folder.
+    /// </summary>
+    public static string? GetChildToward(string folder, string path)
+    {
+        var target = folder.TrimEnd('\\');
+        string? current = path;
+
+        while (current != null)
+        {
+            var parent = GetParent(current);
+
+            if (parent != null && string.Equals(parent.TrimEnd('\\'), target, StringComparison.OrdinalIgnoreCase))
+            {
+                return GetName(current);
+            }
+
+            current = parent;
+        }
+
+        return null;
+    }
+
     public static bool IsValidName(string name)
     {
         return name.Length > 0 && name.Length <= MaxNameLength && name.IndexOfAny(['\\', '/', ':', '*', '?', '"', '<', '>', '|']) < 0;

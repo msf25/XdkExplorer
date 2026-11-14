@@ -42,6 +42,21 @@
         <GradientStop Color="#1F1F22" Offset="1"/>
     </LinearGradientBrush>
 
+    <!-- Fluent overrides. Fluent bakes SystemAccentColor* into its brushes via StaticResource, so the brushes themselves
+         are replaced. Only works where the Fluent template looks the brush up with DynamicResource. -->
+
+    <!-- Focused text box: accent line in the bottom 2 px, the rest keeps the normal stroke. Same shape as Fluent's brush. -->
+    <LinearGradientBrush x:Key="TextControlBorderBrushFocused" MappingMode="Absolute" StartPoint="0,0" EndPoint="0,2">
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform ScaleY="-1" CenterY="0.5"/>
+        </LinearGradientBrush.RelativeTransform>
+        <GradientStop Offset="1.0" Color="{StaticResource AccentColor}"/>
+        <GradientStop Offset="1.0" Color="#12FFFFFF"/>
+    </LinearGradientBrush>
+
+    <!-- Default ProgressBar, e.g. the indeterminate "Loading" bars -->
+    <SolidColorBrush x:Key="ProgressBarForeground" Color="{StaticResource AccentColor}"/>
+
     <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 
 </ResourceDictionary>
